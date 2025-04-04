@@ -46,3 +46,26 @@ Olivier was granted 10 hours of observing time on METIS for his asteroid studies
 He has painstakingly put together a set of Observing Blocks to sent to the telescope operators.
 Now he has 6 months to wait before he gets any real data. 
 In the meantime he wants to simulate the expected raw FITS file when the data finally comes in, so that he can fine-tune his analysis scripts in advance.
+
+
+Code Structure
+--------------
+
+- Input
+  - ETC input JSON contains the following fields
+    - target : scopesim_targets
+    - sky : skycalc effect
+    - instrument : scopesim optical train
+    - timesnr : OpticalTrain.readout
+    - output : which plots to show
+    - instrumentName : which inst pkg to use
+    - seeingiqao : input params for tiptop?
+
+- Modules
+    - a targets translator
+    - a opticaltrain generator
+    - a readouts runner
+
+- Output
+  - FITS file
+

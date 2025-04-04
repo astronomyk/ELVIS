@@ -1,0 +1,82 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "template",
+        "params": {
+          "catalog": "MARCS",
+          "id": "5750:4.5"
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 10,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.1,
+    "moon_fli": 0.5,
+    "pwv": 2.5
+  },
+  "instrument": {
+    "ins_configuration": "IFS",
+    "INS.BAND.NAME": "J_low",
+    "INS.SPXW.NAME": "25mas"
+  },
+  "timesnr": {
+    "DET.NDIT": 1,
+    "DET.DIT": 2
+  },
+  "output": {
+    "throughput": {
+      "atmosphere": false,
+      "telescope": false,
+      "instrument": false,
+      "encircledenergy": false,
+      "detector": false,
+      "totalinclsky": false
+    },
+    "snr": {
+      "snr": true,
+      "noise_components": true
+    },
+    "sed": {
+      "target": false,
+      "sky": false
+    },
+    "signals": {
+      "obstarget": false,
+      "obssky": false,
+      "obstotal": false
+    },
+    "maxsignals": {
+      "maxpixeltarget": false,
+      "maxpixelsky": false,
+      "maxpixeltotal": false
+    },
+    "dispersion": {
+      "dispersion": false
+    },
+    "psf": {
+      "psf": false
+    }
+  },
+  "instrumentName": "eris",
+  "seeingiqao": {
+    "mode": "aolgs",
+    "params": {
+      "gsmag": 12,
+      "separation": 0,
+      "turbulence_category": 50
+    },
+    "aperturepix": 9
+  }
+}

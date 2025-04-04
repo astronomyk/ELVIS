@@ -1,0 +1,51 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "template",
+        "params": {
+          "catalog": "MARCS",
+          "id": "5750:4.5"
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 10,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.1,
+    "moon_fli": 0.5,
+    "pwv": 2.5
+  },
+  "instrument": {
+    "ins_configuration": "nixIMG",
+    "DET.READOUT": "SLOW",
+    "INS.NXCW.NAME": "13mas-JHK",
+    "INS.NXPW.NAME": "noND",
+    "INS.NXFW.NAME": "J"
+  },
+  "timesnr": {
+    "DET.NDIT": 1,
+    "DET.DIT": 2
+  },
+  "output": {},
+  "instrumentName": "eris",
+  "seeingiqao": {
+    "mode": "aolgs",
+    "params": {
+      "gsmag": 12,
+      "separation": 0,
+      "turbulence_category": 50
+    },
+    "aperturepix": 9
+  }
+}
