@@ -1,0 +1,50 @@
+# All under the dictionary "target"
+
+morphology:
+# 1
+    morphologytype: "point"
+# 2
+    morphologytype: "extended"
+    extendedtype: "sersic"
+# 3
+    morphologytype: "extended"
+    extendedtype: "sersic"
+    index: 1
+    radius: 0.5
+
+sed:
+# 1
+    sedtype: "spectrum"
+    extinctionav: 0
+    redshift:
+        redshift: 0.1
+        baryvelcor: 0
+    spectrum:
+    # A
+        spectrumtype: "template"
+        params:
+            catalog: "MARCS"
+            id: "5750:4.5"
+    # B
+        spectrumtype: "blackbody"
+        params:
+            temperature: 1000
+    # C
+        spectrumtype: "powerlaw"
+        params:
+            exponent: 0
+    # D
+        spectrumtype: "upload"
+
+# 2
+    sedtype: "emissionline"
+    emissionline:
+        params:
+            lambda: 1000
+            fwhm: 1
+
+brightness:
+    brightnesstype: "mag"
+    magband: "V"
+    mag: 10
+    magsys: "vega"
