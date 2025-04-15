@@ -1,0 +1,31 @@
+sky:
+    airmass: 1.1
+    moon_fli: 0.5
+    pwv: 7.5
+
+seeingiqao:
+# Option 1
+    mode: "aolgs"
+    aperturepix: 17
+    params:
+        turbulence_category: 50
+        gsmag: 12
+        separation: 0
+
+# Option 2
+    mode: "aongs"
+    aperturepix: 17
+    params:
+        turbulence_category: 10
+        gsmag: 10
+        separation: 0
+
+# Option 3
+    mode: "noao"
+    aperturepix: 89
+    params:
+        turbulence_category: 50
+
+timesnr:
+    DET.NDIT: 31
+    DET.DIT: 2

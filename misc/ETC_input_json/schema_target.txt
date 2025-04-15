@@ -1,42 +1,45 @@
 # All under the dictionary "target"
 
 morphology:
-# 1
+# Option 1
     morphologytype: "point"
-# 2
+# Option 2
+    morphologytype: "extended"
+    extendedtype: "infinite"
+# Option 3
     morphologytype: "extended"
     extendedtype: "sersic"
-# 3
-    morphologytype: "extended"
-    extendedtype: "sersic"
-    index: 1
-    radius: 0.5
+        index: 1
+        radius: 0.5
 
 sed:
-# 1
+# Option 1
     sedtype: "spectrum"
     extinctionav: 0
     redshift:
         redshift: 0.1
         baryvelcor: 0
     spectrum:
-    # A
+    # Option A
         spectrumtype: "template"
         params:
             catalog: "MARCS"
             id: "5750:4.5"
-    # B
+
+    # Option B
         spectrumtype: "blackbody"
         params:
             temperature: 1000
-    # C
+
+    # Option C
         spectrumtype: "powerlaw"
         params:
             exponent: 0
-    # D
+
+    # Option D
         spectrumtype: "upload"
 
-# 2
+# Option 2
     sedtype: "emissionline"
     emissionline:
         params:
