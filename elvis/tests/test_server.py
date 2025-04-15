@@ -1,90 +1,37 @@
-import subprocess
-import time
-import requests
-import json
-import os
 import pytest
-from astropy.io import fits
+import json
 import io
+from path import Path
+from astropy.io import fits
 
 
-@pytest.fixture(scope="session", autouse=True)
-def flask_server():
-    """Start the Flask server for the duration of the test session."""
-    server_process = subprocess.Popen(["python", "../server.py"],
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
-
-    # Wait for the server to start
-    time.sleep(2)
-    for _ in range(10):
-        try:
-            response = requests.get("http://127.0.0.1:5000/")
-            if response.status_code == 404:
-                break
-        except requests.ConnectionError:
-            time.sleep(1)
-    else:
-        print("❌ Server did not start.")
-        server_process.terminate()
-        pytest.exit("Server startup failed", returncode=1)
-
-    yield  # Tests run here
-
-    server_process.terminate()
-    server_process.wait()
-    print("🔴 Server shutdown complete.")
+from elvis.server import app  # import the Flask app
 
 
-import subprocess
-import time
-import requests
-import json
-import os
-import pytest
+JSON_FILENAME = Path(__file__).parent / "mocks/eris_nix.json"
 
+@pytest.fixture
+def client():
+    app.config["TESTING"] = True  # Optional: Flask runs in testing mode
+    with app.test_client() as client:
+        yield client
 
-@pytest.fixture(scope="session", autouse=True)
-def flask_server():
-    """Start the Flask server for the duration of the test session."""
-    server_process = subprocess.Popen(["python", "../server.py"],
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
-
-    # Wait for the server to start
-    time.sleep(2)
-    for _ in range(10):
-        try:
-            response = requests.get("http://127.0.0.1:5000/")
-            if response.status_code == 404:
-                break
-        except requests.ConnectionError:
-            time.sleep(1)
-    else:
-        print("❌ Server did not start.")
-        server_process.terminate()
-        pytest.exit("Server startup failed", returncode=1)
-
-    yield  # Tests run here
-
-    server_process.terminate()
-    server_process.wait()
-    print("🔴 Server shutdown complete.")
-
-
-def test_fits_content_from_response(flask_server):
-    SERVER_URL = "http://127.0.0.1:5000/process"
-    JSON_FILENAME = "mocks/eris_nix.json"
-
+def test_fits_content_from_response(client):
     with open(JSON_FILENAME, "r") as file:
         json_data = json.load(file)
 
-    response = requests.post(SERVER_URL, json=json_data)
+    response = client.post("/process", json=json_data)
+
     assert response.status_code == 200
+    assert response.mimetype == "application/fits"
+
+def test_fits_header_has_keyword_from_input_json(client):
+    with open(JSON_FILENAME, "r") as file:
+        json_data = json.load(file)
+
+    response = client.post("/process", json=json_data)
 
     # Load response content directly as FITS
-    hdul = fits.open(io.BytesIO(response.content))
-    header = hdul[0].header
+    hdul = fits.open(io.BytesIO(response.data))
 
-    # Check that a specific header exists
-    assert header["HEIRARCH TARGET BRIGHTNESS MAG"] == 10
+    assert hdul[0].header["TARGET BRIGHTNESS MAG"] == 10

@@ -2,7 +2,7 @@ from flask import Flask, request, send_file, jsonify
 import os
 import io
 
-from elvis.simulate import simulate_from_json
+from elvis.simulate import ElvisSimulation
 
 app = Flask(__name__)
 PORT = 5000  # Change this to your desired port
@@ -14,7 +14,8 @@ def process_json():
         return jsonify({"error": "Invalid input, expected JSON"}), 400
 
     data = request.get_json()
-    hdul = simulate_from_json(data)
+    sim = ElvisSimulation(data)
+    hdul = sim.simulate()
 
     # Check optional flag: use disk or memory
     use_disk = data.get("output", {}).get("use_disk", False)
