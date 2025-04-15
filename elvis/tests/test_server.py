@@ -1,7 +1,7 @@
 import pytest
 import json
 import io
-from path import Path
+from pathlib import Path
 from astropy.io import fits
 
 

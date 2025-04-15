@@ -1,6 +1,7 @@
 import pytest
-from elvis.simulate import ElvisSimulation
 from astropy.io import fits
+
+from elvis.simulate import ElvisSimulation
 
 
 # Standalone setup function to create the simulation instance
