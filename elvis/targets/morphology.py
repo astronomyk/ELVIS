@@ -44,15 +44,20 @@ class PointSourceMorphology(Morphology):
 
 class InfiniteExtendedMorphology(Morphology):
     def make_field(self, **kwargs):
-        """Returns a placeholder FITS image for infinite source"""
         pixel_scale = kwargs.get("pixel_scale")
         fov_diameter = kwargs.get("fov_diameter")
 
         if pixel_scale is None or fov_diameter is None:
             raise ValueError("pixel_scale and fov_diameter must be provided for extended sources")
 
-        # Placeholder image, actual model not needed (uniform)
-        data = np.zeros((1, 1))
+        # Define grid size (same logic as Sersic)
+        npix = int(np.ceil(fov_diameter / pixel_scale))
+        if npix % 2 == 0:
+            npix += 1  # keep center pixel at center
+
+        # Total flux within 1 arcsec^2 should be 1, ergo each pixel has a value of pixel_scale**2
+        data = np.ones((npix, npix)) * pixel_scale**2
+
         hdu = ImageHDU(data=data, name="INFINITE_EXTENDED")
         hdu.header["PIXSCALE"] = pixel_scale
         hdu.header["FOV_DIAM"] = fov_diameter
@@ -60,7 +65,7 @@ class InfiniteExtendedMorphology(Morphology):
 
 
 class SersicExtendedMorphology(Morphology):
-    def __init__(self, index=1.0, radius=0.5):
+    def __init__(self, index, radius):
         self.index = index  # Sersic index n
         self.radius = radius  # effective radius in arcsec
 
@@ -73,8 +78,8 @@ class SersicExtendedMorphology(Morphology):
         if pixel_scale is None or fov_diameter is None:
             raise ValueError("pixel_scale and fov_diameter must be provided for extended sources")
 
-        if not (0 <= ellipticity < 1):
-            raise ValueError("ellipticity must be in [0, 1)")
+        if not (0 <= ellipticity <= 0.95):
+            raise ValueError("ellipticity must be in [0, 0.95)")
 
         # Convert angle to radians
         theta = np.radians(angle_deg)
