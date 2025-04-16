@@ -38,13 +38,6 @@ class ElvisSimulation:
         hdu = fits.PrimaryHDU()
         header = hdu.header
         add_to_header(self.data)
-        # Add the data to the header
-        # add_to_header(self.target, "TARGET")
-        # add_to_header(self.sky, "SKY")
-        # add_to_header(self.instrument, "INSTRUMENT")
-        # add_to_header(self.timesnr, "TIMESNR")
-        # add_to_header(self.output, "OUTPUT")
-        # add_to_header(self.seeingiqao, "SEEINGAO")
 
         # Create an HDUList with the primary HDU
         hdul = fits.HDUList([hdu])

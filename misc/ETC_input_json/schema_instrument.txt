@@ -1,1 +1,57 @@
-This is very instrument dependent. There seems to be no commonality between instruments. Oh dear.
+# ERIS JSON
+
+instrument:
+    ins_configuration: "IFS"
+    INS.BAND.NAME: "J_low"
+    INS.SPXW.NAME: "25mas"
+
+    ins_configuration: "nixIMG"
+    DET.READOUT: "SLOW"
+    INS.NXCW.NAME: "13mas-JHK"
+    INS.NXPW.NAME: "noND"
+    INS.NXFW.NAME: "J"
+
+    ins_configuration: "nixSAM"
+    DET.READOUT: "FAST"
+    INS.NXCW.NAME: "13mas-JHK"
+    INS.NXPW.NAME: "SAM-7"
+    INS.NXFW.NAME: "J"
+
+    ins_configuration: "nixAPP"
+    DET.READOUT: "SLOW"
+    INS.NXFW.NAME: "K-peak"
+
+    ins_configuration: "nixLSS"
+    DET.READOUT: "SLOW"
+
+
+# CRIRES JSON
+
+instrument:
+    slit: 0.2
+    settingkey: "H1559"
+    polarimetry: "linear"
+    order:
+        0: 39
+        1: 38
+        2: 37
+        3: 36
+        4: 35
+        5: 34
+        6: 33
+        7: 32
+        8: 31
+
+    slit: 0.2
+    settingkey: "Y1028"
+    polarimetry: "free"
+    order:
+        0: 59
+        1: 58
+        2: 57
+        3: 56
+        4: 55
+        5: 54
+        6: 53
+        7: 52
+        8: 51
