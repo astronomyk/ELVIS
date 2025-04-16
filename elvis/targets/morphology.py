@@ -5,21 +5,22 @@ import numpy as np
 
 
 class Morphology(ABC):
+    def __init__(self, params: dict = None):
+        self.params = params or {}      # Store all morphology-level options
+
     @staticmethod
     def from_dict(data: dict):
         morph_type = data.get("morphologytype")
 
         if morph_type == "point":
-            return PointSourceMorphology()
+            return PointSourceMorphology(**data)
 
         elif morph_type == "extended":
             ext_type = data.get("extendedtype")
             if ext_type == "infinite":
-                return InfiniteExtendedMorphology()
+                return InfiniteExtendedMorphology(**data)
             elif ext_type == "sersic":
-                index = data.get("index", 1)
-                radius = data.get("radius", 0.5)
-                return SersicExtendedMorphology(index=index, radius=radius)
+                return SersicExtendedMorphology(**data)
             else:
                 raise ValueError(f"Unknown extendedtype: {ext_type}")
 
@@ -32,18 +33,63 @@ class Morphology(ABC):
 
 
 class PointSourceMorphology(Morphology):
+    def __init__(self, **params):
+        super().__init__(params)
+
     def make_field(self, **kwargs):
-        """Returns an astropy Table with a single point source at (0, 0)"""
+        # Use kwargs if passed; fall back to self.params
+        p = {**self.params, **kwargs}
+
+        x = p.get("x")
+        y = p.get("y")
+        ref = p.get("ref")
+        weight = p.get("weight")
+        spec_type = p.get("spec_type")
+
+        if x is None and y is None:
+            table = Table()
+            table["x"] = [0.0]
+            table["y"] = [0.0]
+            table["ref"] = [0]
+            table["weight"] = [1.0]
+            table["spec_type"] = [None]
+            return table
+
+        if (x is None) != (y is None):
+            raise ValueError("Both 'x' and 'y' must be provided together.")
+
+        x = list(x)
+        y = list(y)
+        n = len(x)
+
+        def validate_or_default(name, arr, default):
+            if arr is None:
+                return [default] * n
+            arr = list(arr)
+            if len(arr) != n:
+                raise ValueError(f"Length mismatch: '{name}' has length {len(arr)}, expected {n}.")
+            return arr
+
+        ref = validate_or_default("ref", ref, 0)
+        weight = validate_or_default("weight", weight, 1.0)
+        spec_type = validate_or_default("spec_type", spec_type, None)
+
         table = Table()
-        table['x'] = [0.0]
-        table['y'] = [0.0]
-        table['ref'] = [0]      # refers to first SED in the scene
-        table['weight'] = [1.0] # total flux
+        table["x"] = x
+        table["y"] = y
+        table["ref"] = ref
+        table["weight"] = weight
+        table["spec_type"] = spec_type
+
         return table
 
 
 class InfiniteExtendedMorphology(Morphology):
+    def __init__(self, **params):
+        super().__init__(params)
+
     def make_field(self, **kwargs):
+        self.params.update(**kwargs)
         pixel_scale = kwargs.get("pixel_scale")
         fov_diameter = kwargs.get("fov_diameter")
 
@@ -65,9 +111,13 @@ class InfiniteExtendedMorphology(Morphology):
 
 
 class SersicExtendedMorphology(Morphology):
-    def __init__(self, index, radius):
-        self.index = index  # Sersic index n
-        self.radius = radius  # effective radius in arcsec
+    def __init__(self, index, radius, **params):
+
+        super().__init__(params)
+        self.index = index
+        self.radius = radius
+        self.ellipticity = self.params.get("ellipticity", 0.0)
+        self.angle = self.params.get("angle", 0.0)
 
     def make_field(self, **kwargs):
         pixel_scale = kwargs.get("pixel_scale")

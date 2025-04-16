@@ -8,7 +8,7 @@ from astropy.io import fits
 from elvis.server import app  # import the Flask app
 
 
-JSON_FILENAME = Path(__file__).parent / "mocks/eris_nix.json"
+JSON_FILENAME = Path(__file__).parent / "data/eris_nix.json"
 
 @pytest.fixture
 def client():
