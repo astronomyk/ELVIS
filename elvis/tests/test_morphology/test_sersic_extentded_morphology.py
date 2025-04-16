@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pytest
-from matplotlib import pyplot as plt
+
 from astropy.io.fits import ImageHDU
 from elvis.etc_parser.targets import SersicExtendedMorphology  # Adjust import as needed
 
@@ -9,6 +9,7 @@ from elvis.etc_parser.targets import SersicExtendedMorphology  # Adjust import a
 def show_image(hdu: ImageHDU, title: str):
     """Show image if not on GitHub Actions (CI = true)"""
     if os.getenv("CI") != "true":
+        from matplotlib import pyplot as plt
         plt.imshow(hdu.data, origin="lower", cmap="viridis", norm="log")
         plt.title(title)
         plt.colorbar(label="Normalized Flux")
