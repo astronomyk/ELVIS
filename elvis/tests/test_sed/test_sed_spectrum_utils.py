@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from synphot import SourceSpectrum
-from elvis.targets.sed_spectrum_utils import (
+from elvis.source.sed_utils import (
     read_marcs_spectrum,
     read_phoenix_spectrum,
     read_swire_spectrum,

@@ -2,7 +2,7 @@ from flask import Flask, request, send_file, jsonify, render_template
 import os
 import io
 
-from elvis.simulate import ElvisSimulation
+from elvis.pipeline import run_simulation
 from elvis.eris_etc_form import eris_etc_form_bp
 from elvis.hawki_etc_form import hawki_etc_form_bp
 
@@ -43,8 +43,7 @@ def process_json():
         return jsonify({"error": "Invalid input, expected JSON"}), 400
 
     data = request.get_json()
-    sim = ElvisSimulation(data)
-    hdul = sim.simulate()
+    hdul = run_simulation(data)
 
     # Check optional flag: use disk or memory
     use_disk = data.get("output", {}).get("use_disk", False)

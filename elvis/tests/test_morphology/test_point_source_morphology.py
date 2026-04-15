@@ -1,6 +1,6 @@
 import pytest
 from astropy.table import Table
-from elvis.targets import PointSourceMorphology
+from elvis.source import PointSourceMorphology
 
 
 def test_default_single_point():

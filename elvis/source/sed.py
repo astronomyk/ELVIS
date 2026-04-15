@@ -2,7 +2,7 @@ from astropy import units as u
 import numpy as np
 from synphot import Gaussian1D, SourceSpectrum
 
-from elvis.targets.sed_spectrum_utils import (
+from elvis.source.sed_utils import (
     get_template_spectrum,
     get_blackbody_spectrum,
     get_powerlaw_spectrum,

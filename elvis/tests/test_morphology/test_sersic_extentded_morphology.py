@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from astropy.io.fits import ImageHDU
-from elvis.targets import SersicExtendedMorphology  # Adjust import as needed
+from elvis.source import SersicExtendedMorphology
 
 
 def show_image(hdu: ImageHDU, title: str):

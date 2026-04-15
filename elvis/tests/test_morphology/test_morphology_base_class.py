@@ -4,7 +4,7 @@ from astropy.table import Table
 from astropy.io.fits import ImageHDU
 import pytest
 
-from elvis.targets import Morphology, PointSourceMorphology, SersicExtendedMorphology, InfiniteExtendedMorphology
+from elvis.source import Morphology, PointSourceMorphology, SersicExtendedMorphology, InfiniteExtendedMorphology
 
 
 def test_point_source_from_dict():

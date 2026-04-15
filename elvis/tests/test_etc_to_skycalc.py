@@ -9,7 +9,7 @@ skycalc microservice and check the returned data.
 import math
 import pytest
 
-from elvis.sky.etc_to_skycalc import (
+from elvis.sky.converter import (
     etc_sky_to_skycalc,
     _fli_to_moon_sun_sep,
     _fli_to_moon_alt,
@@ -227,14 +227,14 @@ class TestSkyCalcYAMLString:
     """Verify YAML string can initialise a SkyCalc object."""
 
     def test_yaml_string_loads(self):
-        from elvis.sky.etc_to_skycalc import to_skycalc_yaml
+        from elvis.sky.converter import to_skycalc_yaml
         params = etc_sky_to_skycalc({"sky": {"airmass": 1.3, "fli": 0.5}})
         yml = to_skycalc_yaml(params)
         assert "airmass" in yml
         assert "pwv" in yml
 
     def test_apply_to_skycalc_creates_object(self):
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         sc = apply_to_skycalc({"sky": {"airmass": 1.5, "fli": 0.8, "waterVapour": 5}})
         assert sc["airmass"] == 1.5
         assert sc["pwv"] == 5.0
@@ -244,7 +244,7 @@ class TestSkyCalcYAMLString:
 
     def test_values_roundtrip_through_yaml(self):
         """Values survive YAML serialisation → SkyCalc load."""
-        from elvis.sky.etc_to_skycalc import to_skycalc_yaml
+        from elvis.sky.converter import to_skycalc_yaml
         params = etc_sky_to_skycalc({
             "sky": {"airmass": 2.0, "fli": 0.25, "waterVapour": 1.5}
         })
@@ -265,7 +265,7 @@ class TestSkyCalcMicroservice:
 
     def test_default_sky_spectrum(self):
         """Default parameters return a table with lam, trans, flux."""
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         sc = apply_to_skycalc({"sky": {"airmass": 1.2, "fli": 0.5}})
         tbl = sc.get_sky_spectrum(return_type="table")
         assert "lam" in tbl.colnames
@@ -275,7 +275,7 @@ class TestSkyCalcMicroservice:
 
     def test_transmission_in_valid_range(self):
         """Atmospheric transmission is between 0 and 1."""
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         sc = apply_to_skycalc({"sky": {"airmass": 1.0, "fli": 0.0}})
         tbl = sc.get_sky_spectrum(return_type="table")
         assert all(tbl["trans"] >= 0)
@@ -283,7 +283,7 @@ class TestSkyCalcMicroservice:
 
     def test_higher_airmass_lower_transmission(self):
         """Higher airmass should reduce mean transmission."""
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         import numpy as np
 
         sc_low = apply_to_skycalc({"sky": {"airmass": 1.0, "fli": 0.0}})
@@ -296,7 +296,7 @@ class TestSkyCalcMicroservice:
 
     def test_full_moon_brighter_sky(self):
         """Full moon (FLI=1) should produce more sky emission than dim moon."""
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         import numpy as np
 
         sc_dim = apply_to_skycalc({
@@ -313,7 +313,7 @@ class TestSkyCalcMicroservice:
 
     def test_higher_pwv_affects_spectrum(self):
         """Different PWV values produce different spectra."""
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
         import numpy as np
 
         sc_dry = apply_to_skycalc({"sky": {"airmass": 1.0, "pwv": 0.5}})
@@ -329,7 +329,7 @@ class TestSkyCalcMicroservice:
         """Full eris_etc_inputform.json sky section → valid spectrum."""
         import json
         from pathlib import Path
-        from elvis.sky.etc_to_skycalc import apply_to_skycalc
+        from elvis.sky.converter import apply_to_skycalc
 
         fpath = Path("D:/Repos/ELVIS/misc/ETC_input_json/eris_etc_inputform.json")
         if not fpath.exists():

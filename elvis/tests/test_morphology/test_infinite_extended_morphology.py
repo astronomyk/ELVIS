@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 
 from astropy.io.fits import ImageHDU
-from elvis.targets import InfiniteExtendedMorphology
+from elvis.source import InfiniteExtendedMorphology
 
 
 def show_image(hdu: ImageHDU, title: str):

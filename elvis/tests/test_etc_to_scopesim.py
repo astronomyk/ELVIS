@@ -8,7 +8,7 @@ catalogs, brightness bands, and edge cases.
 import pytest
 from astropy import units as u
 
-from elvis.targets.etc_to_scopesim import (
+from elvis.source.converter import (
     etc_target_to_scopesim_yaml,
     to_yaml_string,
     to_scopesim_target,

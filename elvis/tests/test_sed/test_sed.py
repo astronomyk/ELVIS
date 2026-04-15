@@ -1,6 +1,6 @@
 import pytest
 from synphot import SourceSpectrum
-from elvis.targets import sed
+from elvis.source import sed
 
 
 @pytest.mark.parametrize("input_dict", [
