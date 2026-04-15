@@ -1,0 +1,87 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "template",
+        "params": {
+          "catalog": "MARCS",
+          "id": "5750:4.5"
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 10,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.2,
+    "fli": 1,
+    "waterVapour": 30,
+    "moonDistance": 30
+  },
+  "seeing": {
+    "turbulence_category": 50,
+    "aperturepix": 0
+  },
+  "instrument": {
+    "ins_configuration": "dic1_slit_std",
+    "INS.SLIT2.WID": 0.6,
+    "DET1.READ.SPEED": "225kHz,1x1,low",
+    "INS.SLIT3.WID": 0.6,
+    "DET2.READ.SPEED": "225kHz,1x1,low",
+    "INS.DICEXP.MODE": "346+580",
+    "INS.FILT1.NAME": "FREE",
+    "PRE_SLIT_OPTICS": "None"
+  },
+  "timesnr": {
+    "SEQ.NOFF": 1,
+    "DET1.WIN1.UIT1": 10,
+    "SEQ.NEXPOBLUE": 1,
+    "DET2.WIN1.UIT1": 10,
+    "SEQ.NEXPORED": 1
+  },
+  "output": {
+    "throughput": {
+      "atmosphere": false,
+      "telescope": false,
+      "instrument": false,
+      "blaze": false,
+      "enslittedenergy": false,
+      "detector": false,
+      "totalinclsky": false
+    },
+    "snr": {
+      "snr": true,
+      "noise_components": true
+    },
+    "sed": {
+      "target": false,
+      "sky": false
+    },
+    "signals": {
+      "obstarget": false,
+      "obssky": false,
+      "obstotal": false
+    },
+    "maxsignals": {
+      "maxpixeltarget": false,
+      "maxpixelsky": false,
+      "maxpixeltotal": false
+    },
+    "dispersion": {
+      "dispersion": false
+    },
+    "psf": {
+      "psf": false
+    }
+  },
+  "instrumentName": "uves"
+}

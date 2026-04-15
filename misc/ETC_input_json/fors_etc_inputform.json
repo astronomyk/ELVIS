@@ -1,0 +1,51 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "template",
+        "params": {
+          "catalog": "MARCS",
+          "id": "5750:4.5"
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 20,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.2,
+    "fli": 1,
+    "waterVapour": 30,
+    "moonDistance": 30
+  },
+  "seeing": {
+    "turbulence_category": 50,
+    "aperturepix": 0
+  },
+  "instrument": {
+    "ins_configuration": "img_nopol",
+    "DET.READ.CLKIND": "200kHz,2x2,low",
+    "INS.FILT1.NAME": "GG435+81",
+    "SEQ.CCD": "R",
+    "INS.COLL.NAID": "COLL_SR+6"
+  },
+  "timesnr": {
+    "DET.WIN1.UIT1": 0.25,
+    "SEQ.NEXPO": 1
+  },
+  "output": {
+    "psf": {
+      "psf": false
+    }
+  },
+  "instrumentName": "fors"
+}

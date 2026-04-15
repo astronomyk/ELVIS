@@ -1,0 +1,90 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "template",
+        "params": {
+          "catalog": "MARCS",
+          "id": "5750:4.5"
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 10,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.2,
+    "fli": 1,
+    "waterVapour": 5,
+    "moonDistance": 30
+  },
+  "seeing": {
+    "turbulence_category": 50,
+    "aperturepix": 0
+  },
+  "instrument": {
+    "ins_configuration": "spec_noao",
+    "INS.WLEN.CWLEN": 1029.31,
+    "INS.SLIT1.NAME": "w_0.2",
+    "orders_list": [
+      59,
+      58,
+      57,
+      56,
+      55,
+      54,
+      53,
+      52,
+      51
+    ]
+  },
+  "timesnr": {
+    "DET1.DIT": 1.427049,
+    "DET1.NDIT": 1
+  },
+  "output": {
+    "throughput": {
+      "atmosphere": false,
+      "telescope": false,
+      "instrument": false,
+      "blaze": false,
+      "enslittedenergy": false,
+      "detector": false,
+      "totalinclsky": false
+    },
+    "snr": {
+      "snr": true,
+      "noise_components": true
+    },
+    "sed": {
+      "target": false,
+      "sky": false
+    },
+    "signals": {
+      "obstarget": false,
+      "obssky": false,
+      "obstotal": false
+    },
+    "maxsignals": {
+      "maxpixeltarget": false,
+      "maxpixelsky": false,
+      "maxpixeltotal": false
+    },
+    "dispersion": {
+      "dispersion": false
+    },
+    "psf": {
+      "psf": false
+    }
+  },
+  "instrumentName": "crires2"
+}

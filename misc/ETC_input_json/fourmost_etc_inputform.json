@@ -1,0 +1,69 @@
+{
+  "target": {
+    "morphology": {
+      "morphologytype": "point"
+    },
+    "sed": {
+      "sedtype": "spectrum",
+      "spectrum": {
+        "spectrumtype": "powerlaw",
+        "params": {
+          "exponent": 0
+        }
+      },
+      "extinctionav": 0
+    },
+    "brightness": {
+      "brightnesstype": "mag",
+      "magband": "V",
+      "mag": 10,
+      "magsys": "vega"
+    }
+  },
+  "sky": {
+    "airmass": 1.2,
+    "fli": 1,
+    "waterVapour": 30,
+    "moonDistance": 30
+  },
+  "seeing": {},
+  "instrument": {
+    "ins_configuration": "unique",
+    "RESOLUTION": "hrs"
+  },
+  "timesnr": {
+    "DET1.UIT1": 1800,
+    "SEQ.NEXPO": 5
+  },
+  "output": {
+    "throughput": {
+      "atmosphere": false,
+      "telescope": false,
+      "instrument": false,
+      "fibinj": false,
+      "totalinclsky": false
+    },
+    "snr": {
+      "snr": true,
+      "noise_components": true
+    },
+    "sed": {
+      "target": false,
+      "sky": false
+    },
+    "signals": {
+      "obstarget": false,
+      "obssky": false,
+      "obstotal": false
+    },
+    "maxsignals": {
+      "maxpixeltarget": false,
+      "maxpixelsky": false,
+      "maxpixeltotal": false
+    },
+    "dispersion": {
+      "dispersion": false
+    }
+  },
+  "instrumentName": "fourmost"
+}

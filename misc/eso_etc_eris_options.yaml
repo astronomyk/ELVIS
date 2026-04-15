@@ -1,0 +1,808 @@
+# =============================================================================
+# ESO ETC 2.0 - ERIS Input Options (JSON API Schema)
+# =============================================================================
+# Web UI: https://etc.eso.org/eris
+# API endpoint: https://etc.eso.org/observing/etc/etcapi/Eris/
+#   Method: POST, Content-Type: application/json
+#   Body: JSON input form (this schema)
+#   Upload: ?filename=<name>&data=<url-encoded-json> with file in multipart body
+#   Upload docs: https://etc.eso.org/doc/upload.html
+#   CLI script: etc_cli.py (see misc/ESO_scripts/)
+#
+# Instrument: ERIS (Enhanced Resolution Imager and Spectrograph)
+# Telescope: VLT UT4 (Yepun), Cassegrain focus
+# Sub-instruments: SPIFFIER (IFS), NIX (Imager)
+# IP Version: 117.12
+#
+# This file documents ALL input options for the ERIS ETC JSON input form.
+# Structure mirrors the actual JSON keys used by the API.
+# Sources: ETC saved HTML pages, JSON input forms, ESO instrument docs,
+#          SM Rules, ETC help pages, etc_cli.py
+#
+# NOTE: Two JSON format variants exist (see notes at bottom of file).
+#       This file documents the format produced by the web UI.
+# =============================================================================
+
+
+# =============================================================================
+# target
+# =============================================================================
+target:
+
+  # ---------------------------------------------------------------------------
+  # target.morphology
+  # ---------------------------------------------------------------------------
+  morphology:
+    morphologytype:
+      type: radio
+      options:
+        - value: "point"
+          description: "Point Source (spatially unresolved)"
+
+        - value: "extended"
+          description: "Extended Source (spatially resolved)"
+          requires:
+            extendedtype:
+              type: select
+              options:
+                - value: "infinite"
+                  description: "Infinite uniform extended source (per arcsec^2)"
+                - value: "sersic"
+                  description: "Sersic profile"
+                  requires:
+                    index:
+                      type: float
+                      description: "Sersic index (1=exponential, 4=de Vaucouleurs)"
+                      example: 1
+                    radius:
+                      type: float
+                      unit: arcsec
+                      description: "Effective (half-light) radius"
+                      example: 0.5
+
+  # ---------------------------------------------------------------------------
+  # target.sed
+  # ---------------------------------------------------------------------------
+  sed:
+    sedtype:
+      type: radio
+      options:
+
+        # --- Option 1: Spectrum (continuum source) ---
+        - value: "spectrum"
+          description: "Continuum source defined by a spectral shape"
+          requires:
+            spectrum:
+              spectrumtype:
+                type: select
+                options:
+
+                  - value: "template"
+                    description: "Stellar or galaxy template from catalog"
+                    requires:
+                      params:
+                        catalog:
+                          type: select
+                          description: "Template catalog"
+                          options:
+                            - value: "MARCS"
+                              description: "MARCS 1D LTE model atmospheres"
+                              id_format: "Teff:logg"
+                              id_example: "5750:4.5"
+                            - value: "PHOENIX"
+                              description: "PHOENIX model atmospheres (T/L/M dwarfs)"
+                              note: "Template params change dynamically"
+                            - value: "SWIRE"
+                              description: "SWIRE galaxy templates"
+                              note: "Template params change dynamically"
+                        id:
+                          type: string
+                          description: "Template identifier (catalog-dependent)"
+                          example: "5750:4.5"
+
+                  - value: "blackbody"
+                    description: "Planck function"
+                    requires:
+                      params:
+                        temperature:
+                          type: float
+                          unit: K
+                          description: "Blackbody temperature"
+                          example: 1000
+
+                  - value: "powerlaw"
+                    description: "Power law spectrum F_lambda ~ lambda^exponent"
+                    requires:
+                      params:
+                        exponent:
+                          type: float
+                          description: "Power law exponent"
+                          example: 0
+
+                  - value: "upload"
+                    description: "User-uploaded spectrum file"
+
+        # --- Option 2: Emission Line ---
+        - value: "emissionline"
+          description: "Single Gaussian emission line (no continuum)"
+          requires:
+            emissionline:
+              params:
+                lambda:
+                  type: float
+                  unit: nm
+                  description: "Central wavelength of emission line"
+                  example: 1000
+                fwhm:
+                  type: float
+                  unit: nm
+                  description: "Full width at half maximum"
+                  example: 1
+
+    extinctionav:
+      type: float
+      unit: mag
+      description: "Interstellar extinction A_V"
+      default: 0
+
+    redshift:
+      description: "Redshift and barycentric velocity correction"
+      enabled:
+        type: checkbox
+        formcontrolname: "redshiftEnabled"
+        default: false
+      redshiftType:
+        type: radio
+        options:
+          - value: "redshift"
+            description: "Cosmological redshift z"
+          - value: "radialVelocity"
+            description: "Radial velocity (km/s)"
+      redshift:
+        type: float
+        description: "Redshift z (when redshiftType=redshift)"
+        default: 0
+      baryvelcor:
+        type: float
+        unit: km/s
+        description: "Barycentric velocity correction"
+        default: 0
+
+  # ---------------------------------------------------------------------------
+  # target.brightness
+  # ---------------------------------------------------------------------------
+  brightness:
+    brightnesstype:
+      value: "mag"
+
+    magband:
+      type: select
+      description: "Photometric band for normalisation"
+      options:
+        standard: [U, B, V, R, I, Y, J, H, K, L, M, N]
+        gaia: [gaia_GBP, gaia_G, gaia_GRP]
+        sdss: [sdss_u, sdss_g, sdss_r, sdss_i, sdss_z]
+        decam: [DECam_g, DECam_r, DECam_i, DECam_z]
+        lsst: [lsst_u, lsst_g, lsst_r, lsst_i, lsst_z, lsst_y]
+        vista: [VISTA_Y, VISTA_Z, VISTA_J, VISTA_H, VISTA_Ks]
+        4most: [4MOST_Johnson_B, 4MOST_Johnson_V, 4MOST_Cousins_R, 4MOST_Cousins_I]
+      total_count: 39
+
+    mag:
+      type: float
+      description: "Apparent magnitude (per arcsec^2 for extended sources)"
+      default: 10
+
+    magsys:
+      type: select
+      options:
+        - value: "vega"
+        - value: "AB"
+
+
+# =============================================================================
+# sky
+# =============================================================================
+sky:
+  airmass:
+    type: float
+    description: "Target airmass"
+    default: 1.2
+
+  fli:
+    type: float
+    description: "Fractional Lunar Illumination (0=new, 1=full)"
+    range: {min: 0.0, max: 1.0}
+    default: 1
+
+  moonDistance:
+    type: float
+    unit: degrees
+    description: "Moon-Target angular separation"
+    default: 30
+
+  waterVapour:
+    type: float
+    unit: mm
+    description: "Precipitable Water Vapour (PWV)"
+    default: 30
+    note: "See _reference_pwv_options for standard values"
+
+
+# =============================================================================
+# seeing  (Seeing / Image Quality / AO)
+# =============================================================================
+seeing:
+  turbulence_category:
+    type: select
+    description: "Atmospheric turbulence percentile (ERIS: 6 categories)"
+    options:
+      - value: 10
+        label: "10% (seeing <= 0.6 arcsec)"
+        max_airmass: 2.0
+      - value: 20
+        label: "20% (seeing <= 0.7 arcsec)"
+        max_airmass: 2.0
+      - value: 30
+        label: "30% (seeing <= 0.8 arcsec)"
+        max_airmass: 2.0
+      - value: 50
+        label: "50% (seeing <= 1.0 arcsec)"
+        max_airmass: 1.96
+      - value: 70
+        label: "70% (seeing <= 1.15 arcsec)"
+        max_airmass: 1.55
+      - value: 85
+        label: "85% (seeing <= 1.4 arcsec)"
+        max_airmass: 1.12
+    default: 50
+
+  SEQ.TTS.MAG:
+    type: float
+    description: "LGS R Magnitude of tip-tilt star (for LGS AO mode)"
+    default: 0
+
+  separation:
+    type: float
+    unit: arcsec
+    description: "Target-to-guide-star separation"
+    default: 0
+    note: "0 = on-axis. NGS: <30 arcsec recommended."
+
+  aperturepix:
+    type: select
+    description: "Extraction aperture diameter in pixels for S/N calculation"
+    options: [1, 3, 5, 7, 9, 11, 13, 15, 17, 21, 35, 55, 89]
+    default: 9
+
+
+# =============================================================================
+# instrument
+# =============================================================================
+instrument:
+
+  # ---------------------------------------------------------------------------
+  # The web UI has two separate dropdowns: observingMode and aoMode.
+  # The JSON payload combines them as ins_configuration: "{mode}_{ao}"
+  # e.g. "ifs_lgs", "img_ngs", "sam_noao", etc.
+  # ---------------------------------------------------------------------------
+
+  # --- Observing Mode (UI dropdown id="observingMode") ---
+  observingMode:
+    type: select
+    options:
+      - value: "ifs"
+        label: "IFS (SPIFFIER)"
+      - value: "img"
+        label: "Imaging (NIX)"
+      - value: "sam"
+        label: "SAM (NIX)"
+      - value: "app"
+        label: "APP (NIX)"
+      - value: "lss"
+        label: "LSS (NIX)"
+
+  # --- AO Mode (UI dropdown id="aoMode") ---
+  aoMode:
+    type: select
+    options:
+      - value: "lgs"
+        label: "LGS (Laser Guide Star)"
+      - value: "ngs"
+        label: "NGS (Natural Guide Star)"
+      - value: "noao"
+        label: "No AO (seeing-limited)"
+
+  # --- Combined JSON key ---
+  ins_configuration:
+    description: "Constructed as '{observingMode}_{aoMode}'"
+    examples:
+      - "ifs_lgs"
+      - "ifs_ngs"
+      - "ifs_noao"
+      - "img_lgs"
+      - "img_ngs"
+      - "img_noao"
+      - "sam_lgs"
+      - "sam_ngs"
+      - "app_lgs"
+      - "app_ngs"
+      - "lss_lgs"
+      - "lss_ngs"
+      - "lss_noao"
+
+  # ===========================================================================
+  # IFS (SPIFFIER) sub-parameters
+  # Shown when observingMode = "ifs"
+  # ===========================================================================
+  INS.BAND.NAME:
+    type: select
+    description: "Grating / spectral band (IFS mode)"
+    shown_when: "observingMode = ifs"
+    options:
+      # Low resolution (R ~ 5000-5600, full band)
+      - value: "J_low"
+        band: J
+        resolution: ~5000
+        wavelength_range_um: [1.09, 1.42]
+      - value: "H_low"
+        band: H
+        resolution: ~5600
+        wavelength_range_um: [1.45, 1.87]
+      - value: "K_low"
+        band: K
+        resolution: ~5600
+        wavelength_range_um: [1.93, 2.48]
+      # High resolution (R ~ 10000-11200, half band)
+      - value: "J_short"
+        band: J
+        resolution: ~10000
+        wavelength_range_um: [1.10, 1.25]
+      - value: "J_middle"
+        band: J
+        resolution: ~10000
+        wavelength_range_um: [1.17, 1.33]
+      - value: "J_long"
+        band: J
+        resolution: ~10000
+        wavelength_range_um: [1.25, 1.43]
+      - value: "H_short"
+        band: H
+        resolution: ~10000
+        wavelength_range_um: [1.46, 1.66]
+      - value: "H_middle"
+        band: H
+        resolution: ~10000
+        wavelength_range_um: [1.56, 1.77]
+      - value: "H_long"
+        band: H
+        resolution: ~10000
+        wavelength_range_um: [1.66, 1.87]
+      - value: "K_short"
+        band: K
+        resolution: ~11200
+        wavelength_range_um: [1.93, 2.20]
+      - value: "K_middle"
+        band: K
+        resolution: ~11200
+        wavelength_range_um: [2.07, 2.35]
+      - value: "K_long"
+        band: K
+        resolution: ~11200
+        wavelength_range_um: [2.20, 2.47]
+
+  INS.SPXW.NAME:
+    type: select
+    description: "Plate scale / spaxel size (IFS mode)"
+    shown_when: "observingMode = ifs"
+    options:
+      - value: "25mas"
+        spaxel_size_mas: [12.5, 25]
+        fov_arcsec: [0.8, 0.8]
+      - value: "100mas"
+        spaxel_size_mas: [50, 100]
+        fov_arcsec: [3.2, 3.2]
+      - value: "250mas"
+        spaxel_size_mas: [125, 250]
+        fov_arcsec: [8.0, 8.0]
+
+  # ===========================================================================
+  # NIX sub-parameters
+  # Shown when observingMode = "img", "sam", "app", or "lss"
+  # ===========================================================================
+  DET.READOUT:
+    type: select
+    description: "Detector readout mode (NIX modes)"
+    shown_when: "observingMode in [img, sam, app, lss]"
+    options:
+      - value: "SLOW"
+        min_dit_s: 1.6
+      - value: "FAST"
+        min_dit_s: 0.034
+
+  INS.NXCW.NAME:
+    type: select
+    description: "Camera wheel / pixel scale (NIX imaging & SAM)"
+    shown_when: "observingMode in [img, sam]"
+    options:
+      - value: "13mas-JHK"
+        pixel_scale_mas: 13
+        fov_arcsec: [26, 26]
+        wavelength_range_um: [1.0, 2.5]
+      - value: "27mas-JHK"
+        pixel_scale_mas: 27
+        fov_arcsec: [55, 55]
+        wavelength_range_um: [1.0, 2.5]
+      - value: "13mas-LM"
+        pixel_scale_mas: 13
+        fov_arcsec: [26, 26]
+        wavelength_range_um: [2.5, 5.3]
+
+  INS.NXPW.NAME:
+    type: select
+    description: "Pupil wheel (ND filter or aperture mask)"
+    options_by_mode:
+      img:
+        - value: "noND"
+          description: "No neutral density filter"
+      sam:
+        - value: "SAM-7"
+          description: "7-hole sparse aperture mask"
+        - value: "SAM-9"
+          description: "9-hole sparse aperture mask"
+        - value: "SAM-23"
+          description: "23-hole sparse aperture mask"
+
+  INS.NXFW.NAME:
+    type: select
+    description: "Filter wheel (NIX modes: img, sam, app)"
+    shown_when: "observingMode in [img, sam, app]"
+    options:
+      # Broadband
+      - value: "J"
+        center_um: 1.28
+        type: broadband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "H"
+        center_um: 1.66
+        type: broadband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "Ks"
+        center_um: 2.18
+        type: broadband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "Short-Lp"
+        center_um: 3.32
+        type: broadband
+        cameras: [13mas-LM]
+      - value: "L-Broad"
+        center_um: 3.57
+        fwhm_um: 1.04
+        type: broadband
+        cameras: [13mas-LM]
+      - value: "Lp"
+        center_um: 3.79
+        type: broadband
+        cameras: [13mas-LM]
+      - value: "Mp"
+        center_um: 4.78
+        type: broadband
+        cameras: [13mas-LM]
+      # Narrowband
+      - value: "Pa-b"
+        center_um: 1.282
+        type: narrowband
+        line: "Paschen-beta"
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "Fe-II"
+        center_um: 1.644
+        type: narrowband
+        line: "[Fe II]"
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "H2-cont"
+        center_um: 2.068
+        type: narrowband
+        line: "H2 continuum"
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "H2-1-0S"
+        center_um: 2.120
+        type: narrowband
+        line: "H2 1-0 S(1)"
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "Br-g"
+        center_um: 2.172
+        type: narrowband
+        line: "Brackett-gamma"
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "K-peak"
+        center_um: 2.198
+        type: narrowband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "IB-2.42"
+        center_um: 2.420
+        type: narrowband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "IB-2.48"
+        center_um: 2.479
+        type: narrowband
+        cameras: [13mas-JHK, 27mas-JHK]
+      - value: "Br-a-cont"
+        center_um: 3.965
+        type: narrowband
+        line: "Brackett-alpha continuum"
+        cameras: [13mas-LM]
+      - value: "Br-a"
+        center_um: 4.051
+        type: narrowband
+        line: "Brackett-alpha"
+        cameras: [13mas-LM]
+    note_app: "APP mode: only K and L narrowband filters (K-peak, Ks, Lp)"
+
+  # LSS mode has no filter/camera selection
+  lss_fixed_params:
+    description: "NIX Long-Slit Spectroscopy (fixed configuration)"
+    shown_when: "observingMode = lss"
+    spectral_resolution: ~900
+    wavelength_range_um: [3.05, 4.05]
+    slit_width_mas: 86
+
+
+# =============================================================================
+# timesnr  (Exposure Time / Signal-to-Noise)
+# =============================================================================
+timesnr:
+  mode:
+    type: radio
+    options:
+      - value: "nexp"
+        description: "Enter DIT and NDIT, ETC calculates S/N"
+      - value: "snr"
+        description: "Enter target S/N, ETC calculates required NDIT"
+
+  DET.DIT:
+    type: float
+    unit: s
+    description: "Detector Integration Time (single exposure duration)"
+    default: 2
+    constraints:
+      - "If DIT > 150s: must be 180, 300, 450, 600, or 900 s"
+      - "NIX SLOW min DIT: 1.6s"
+      - "NIX FAST min DIT: 0.034s"
+
+  DET.NDIT:
+    type: integer
+    description: "Number of detector integrations"
+    default: 1
+    note: "Total integration = DIT x NDIT (excludes overheads)"
+
+
+# =============================================================================
+# output  (Selectable Output Plots)
+# =============================================================================
+output:
+  description: "Boolean flags to enable/disable output plots"
+
+  snr:
+    snr:
+      type: boolean
+      default: true
+      description: "S/N ratio per spectral pixel"
+    noise_components:
+      type: boolean
+      default: true
+      description: "Dynamic S/N formula"
+
+  sed:
+    target:
+      type: boolean
+      default: false
+      description: "Target SED spectrum"
+    sky:
+      type: boolean
+      default: false
+      description: "Sky SED spectrum"
+
+  signals:
+    obstarget:
+      type: boolean
+      default: false
+      description: "Observed target signal (e-/pixel/DIT)"
+    obssky:
+      type: boolean
+      default: false
+      description: "Observed sky signal (e-/pixel/DIT)"
+    obstotal:
+      type: boolean
+      default: false
+      description: "Total observed signal (target + sky)"
+
+  maxsignals:
+    maxpixeltarget:
+      type: boolean
+      default: false
+      description: "Target contribution to max pixel"
+    maxpixelsky:
+      type: boolean
+      default: false
+      description: "Sky contribution to max pixel"
+    maxpixeltotal:
+      type: boolean
+      default: false
+      description: "Total max pixel value"
+
+  throughput:
+    atmosphere:
+      type: boolean
+      default: false
+      description: "Atmospheric transmission"
+    telescope:
+      type: boolean
+      default: false
+      description: "Telescope reflectivity efficiency"
+    instrument:
+      type: boolean
+      default: false
+      description: "Instrument efficiency"
+    encircledenergy:
+      type: boolean
+      default: false
+      description: "Encircled energy fraction"
+    detector:
+      type: boolean
+      default: false
+      description: "Detector QE"
+    totalinclsky:
+      type: boolean
+      default: false
+      description: "Total throughput including sky"
+
+  dispersion:
+    dispersion:
+      type: boolean
+      default: false
+      description: "Spectral dispersion per pixel"
+
+  psf:
+    psf:
+      type: boolean
+      default: false
+      description: "Point Spread Function"
+
+
+# =============================================================================
+# instrumentName (top-level key)
+# =============================================================================
+instrumentName:
+  type: string
+  value: "eris"
+
+
+# =============================================================================
+# MARCS Template Parameters
+# (shown when catalog = "MARCS", id = "Teff:logg")
+# =============================================================================
+_reference_marcs_templates:
+  id_format: "Teff:logg"
+  Teff_K:
+    description: "Effective temperature (dropdown id0Sel)"
+    values:
+      - 3000
+      - 3100
+      - 3200
+      - 3300
+      - 3400
+      - 3500
+      - 3600
+      - 3700
+      - 3800
+      - 3900
+      - 4000
+      - 4250
+      - 4500
+      - 4750
+      - 5000
+      - 5250
+      - 5500
+      - 5750
+      - 6000
+      - 6250
+      - 6500
+      - 6750
+      - 7000
+      - 7250
+      - 7500
+      - 7750
+      - 8000
+    count: 27
+  logg:
+    description: "Surface gravity log(g) (dropdown id1Sel)"
+    values: [3.0, 3.5, 4.0, 4.5, 5.0]
+    count: 5
+  note: >
+    Not all Teff/logg combinations are valid. The ETC dynamically
+    filters the log(g) dropdown based on the selected Teff.
+
+
+# =============================================================================
+# Standard PWV values (used in sky.waterVapour)
+# From HAWK-I ETC v1 dropdown; ETC 2.0 accepts free-form values too
+# =============================================================================
+_reference_pwv_options_mm:
+  [0.10, 0.25, 0.50, 1.0, 1.5, 2.5, 3.5, 5.0, 7.5, 10.0, 20.0, 30.0]
+
+
+# =============================================================================
+# Pickles Spectral Types (NOT in ERIS ETC 2.0 - for reference only)
+# Available in FORS2/UVES ETC 2.0 (catalog="Pickles") and ETC v1
+# =============================================================================
+_reference_pickles_spectral_types:
+  note: "ERIS ETC catalogs are MARCS/PHOENIX/SWIRE only. Pickles is available in FORS2/UVES."
+  main_sequence_V:
+    [O5V, O9V, B0V, B1V, B3V, B5-7V, B8V, A0V, A2V, A3V, A5V,
+     F0V, F2V, F5V, F8V, G0V, G2V, G5V, G8V, K0V, K2V, K5V, K7V,
+     M0V, M2V, M4V, M5V]
+  subgiant_IV:
+    [B2IV, B6IV, A0IV, A4-7IV, F0-2IV, F5IV, F8IV, G0IV, G2IV,
+     G5IV, G8IV, K0IV, K1IV, K3IV]
+  giant_III:
+    [O8III, B1-2III, B5III, B9III, A0III, A5III, F0III, F5III, G0III,
+     G5III, G8III, K0III, K3III, K5III, M0III, M5III, M10III]
+  bright_giant_II:
+    [B2II, B5II, F0II, F2II, G5II, K0-1II, K3-4II, M3II]
+  supergiant_I:
+    [B0I, B5I, B8I, A0I, F0I, F5I, F8I, G0I, G5I, G8I, K2I, K4I, M2I]
+
+
+# =============================================================================
+# Full catalog list (varies by instrument)
+# =============================================================================
+_reference_catalogs_by_instrument:
+  eris: [MARCS, PHOENIX, SWIRE]
+  fors2: [Kinney, Kurucz, MARCS, PHOENIX, Pickles, SWIRE, Various]
+  uves: [Kinney, Kurucz, MARCS, PHOENIX, Pickles, SWIRE, Various]
+  crires: [MARCS, PHOENIX, SWIRE]
+
+
+# =============================================================================
+# API Response Structure (output from etc_cli.py / etc_json2ascii.py)
+# =============================================================================
+# The API returns JSON with this structure (ERIS has no orders):
+#
+#   {
+#     "data": {
+#       "detectors": [
+#         {
+#           "name": "<detector>",
+#           "wavelength": [<float>, ...],       # wavelength array (nm)
+#           "plots": {
+#             "<groupkey>": {                   # matches output toggle groups
+#               "<serieskey>": [<float>, ...]   # same length as wavelength
+#             }
+#           }
+#         }
+#       ]
+#     }
+#   }
+#
+# For multi-order instruments (e.g. CRIRES):
+#   data.orders[].order, data.orders[].detectors[]
+# =============================================================================
+
+
+# =============================================================================
+# NOTE: JSON Format Variants
+# =============================================================================
+# Two JSON formats have been observed:
+#
+# Format A (Web UI / eris_etc_inputform.json):
+#   - sky: {airmass, fli, waterVapour, moonDistance}
+#   - seeing: {turbulence_category, separation, aperturepix, SEQ.TTS.MAG}
+#   - instrument.ins_configuration: "ifs_lgs" (combined mode_ao)
+#
+# Format B (eris_nix.json / eris_spiffier.json):
+#   - sky: {airmass, moon_fli, pwv}
+#   - seeingiqao: {mode: "aolgs", params: {gsmag, separation, turbulence_category}, aperturepix}
+#   - instrument.ins_configuration: "IFS" or "nixIMG" (mode only, AO in seeingiqao)
+#
+# Both formats are accepted by the API. Format A is what the web UI generates.
+# =============================================================================

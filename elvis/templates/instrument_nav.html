@@ -1,0 +1,11 @@
+<nav class="instrument-nav">
+  <a href="/" class="instrument-nav-brand">ELVIS</a>
+  <div class="instrument-nav-links">
+    {% for inst in INSTRUMENTS %}
+      <a href="{{ inst.url }}"
+         {% if inst.id == current_instrument %}class="active"{% endif %}>
+        {{ inst.name }}
+      </a>
+    {% endfor %}
+  </div>
+</nav>

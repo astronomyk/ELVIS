@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ELVIS — ELT Virtual Instrument Simulator</title>
+  <link rel="stylesheet" href="/static/css/etc_form.css">
+</head>
+<body>
+
+{% include 'instrument_nav.html' %}
+
+<main class="index-main">
+  <h1>ELVIS</h1>
+  <p class="index-subtitle">ELT Virtual Instrument Simulator</p>
+  <p class="index-desc">
+    Select an instrument below to open its ETC JSON builder.
+  </p>
+
+  <div class="instrument-cards">
+    {% for inst in INSTRUMENTS %}
+    <a href="{{ inst.url }}" class="instrument-card">
+      <h2>{{ inst.name }}</h2>
+      <p>{{ inst.description }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</main>
+
+</body>
+</html>

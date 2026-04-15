@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HAWK-I ETC JSON Builder</title>
+  <link rel="stylesheet" href="/static/css/etc_form.css">
+</head>
+<body>
+
+{% include 'instrument_nav.html' %}
+
+<header>
+  <h1>HAWK-I ETC 2.0 &mdash; JSON Builder</h1>
+  <div class="header-actions">
+    <label class="btn btn-secondary" for="loadFile">Load JSON</label>
+    <input type="file" id="loadFile" accept="application/json" hidden>
+    <button class="btn" id="btnPreview">Preview JSON</button>
+    <button class="btn btn-primary" id="btnDownload">Download JSON</button>
+    <button class="btn btn-accent" id="btnSend">Send to ETC</button>
+  </div>
+</header>
+
+<!-- Tabs -->
+<nav class="tabs">
+  <input type="radio" name="tab" id="tab-target" checked>
+  <label for="tab-target">Target</label>
+  <input type="radio" name="tab" id="tab-sky">
+  <label for="tab-sky">Sky</label>
+  <input type="radio" name="tab" id="tab-seeing">
+  <label for="tab-seeing">Seeing / AO</label>
+  <input type="radio" name="tab" id="tab-instrument">
+  <label for="tab-instrument">Instrument</label>
+  <input type="radio" name="tab" id="tab-timesnr">
+  <label for="tab-timesnr">Exp. Time</label>
+  <input type="radio" name="tab" id="tab-output">
+  <label for="tab-output">Output</label>
+</nav>
+
+<main>
+
+<!-- ===== TARGET TAB ===== -->
+<section class="tab-panel" data-tab="tab-target">
+
+  <fieldset>
+    <legend>Morphology</legend>
+    <div class="form-row">
+      <label>Type</label>
+      <div class="radio-group">
+        <label><input type="radio" name="morphologytype" value="point" checked> Point Source</label>
+        <label><input type="radio" name="morphologytype" value="extended"> Extended Source</label>
+      </div>
+    </div>
+    <div class="conditional" data-depends-on="morphologytype" data-depends-value="extended">
+      <div class="form-row">
+        <label for="extendedtype">Profile</label>
+        <select id="extendedtype" name="extendedtype">
+          <option value="infinite">Infinite uniform</option>
+          <option value="sersic">Sersic profile</option>
+        </select>
+      </div>
+      <div class="conditional" data-depends-on="extendedtype" data-depends-value="sersic">
+        <div class="form-row">
+          <label for="sersic_index">Sersic index</label>
+          <input type="number" id="sersic_index" name="sersic_index" value="1" step="0.1" min="0.1">
+        </div>
+        <div class="form-row">
+          <label for="sersic_radius">Eff. radius (arcsec)</label>
+          <input type="number" id="sersic_radius" name="sersic_radius" value="0.5" step="0.1" min="0.01">
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>SED</legend>
+    <div class="form-row">
+      <label>Source type</label>
+      <div class="radio-group">
+        <label><input type="radio" name="sedtype" value="spectrum" checked> Spectrum</label>
+        <label><input type="radio" name="sedtype" value="emissionline"> Emission Line</label>
+      </div>
+    </div>
+
+    <!-- Spectrum options -->
+    <div class="conditional" data-depends-on="sedtype" data-depends-value="spectrum">
+      <div class="form-row">
+        <label for="spectrumtype">Spectrum type</label>
+        <select id="spectrumtype" name="spectrumtype">
+          <option value="template">Template</option>
+          <option value="blackbody">Blackbody</option>
+          <option value="powerlaw">Power Law</option>
+          <option value="upload">Upload</option>
+        </select>
+      </div>
+
+      <!-- Template options -->
+      <div class="conditional" data-depends-on="spectrumtype" data-depends-value="template">
+        <div class="form-row">
+          <label for="catalog">Catalog</label>
+          <select id="catalog" name="catalog">
+            <option value="MARCS">MARCS</option>
+            <option value="PHOENIX">PHOENIX</option>
+            <option value="SWIRE">SWIRE</option>
+          </select>
+        </div>
+        <!-- MARCS/PHOENIX: Teff + logg dropdowns -->
+        <div id="template-teff-logg">
+          <div class="form-row">
+            <label for="teff">Teff [K]</label>
+            <select id="teff" name="teff"></select>
+          </div>
+          <div class="form-row">
+            <label for="logg">log(g)</label>
+            <select id="logg" name="logg"></select>
+          </div>
+        </div>
+        <!-- SWIRE: single template dropdown -->
+        <div id="template-swire" style="display:none">
+          <div class="form-row">
+            <label for="swire_template">Template</label>
+            <select id="swire_template" name="swire_template"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blackbody -->
+      <div class="conditional" data-depends-on="spectrumtype" data-depends-value="blackbody">
+        <div class="form-row">
+          <label for="bb_temperature">Temperature [K]</label>
+          <input type="number" id="bb_temperature" name="bb_temperature" value="1000" min="1">
+        </div>
+      </div>
+
+      <!-- Power law -->
+      <div class="conditional" data-depends-on="spectrumtype" data-depends-value="powerlaw">
+        <div class="form-row">
+          <label for="pl_exponent">Exponent</label>
+          <input type="number" id="pl_exponent" name="pl_exponent" value="0" step="0.1">
+        </div>
+      </div>
+    </div>
+
+    <!-- Emission line options -->
+    <div class="conditional" data-depends-on="sedtype" data-depends-value="emissionline">
+      <div class="form-row">
+        <label for="em_lambda">Wavelength [nm]</label>
+        <input type="number" id="em_lambda" name="em_lambda" value="1000" step="0.1" min="0">
+      </div>
+      <div class="form-row">
+        <label for="em_fwhm">FWHM [nm]</label>
+        <input type="number" id="em_fwhm" name="em_fwhm" value="1" step="0.1" min="0">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="extinctionav">Extinction A<sub>V</sub></label>
+      <input type="number" id="extinctionav" name="extinctionav" value="0" step="0.1" min="0">
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Redshift</legend>
+    <div class="form-row">
+      <label><input type="checkbox" id="redshiftEnabled" name="redshiftEnabled"> Enable</label>
+    </div>
+    <div class="conditional" data-depends-on="redshiftEnabled" data-depends-value="true">
+      <div class="form-row">
+        <label for="redshift">Redshift z</label>
+        <input type="number" id="redshift" name="redshift" value="0" step="0.001">
+      </div>
+      <div class="form-row">
+        <label for="baryvelcor">Bary. vel. corr. [km/s]</label>
+        <input type="number" id="baryvelcor" name="baryvelcor" value="0" step="1">
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Brightness</legend>
+    <div class="form-row">
+      <label for="magband">Band</label>
+      <select id="magband" name="magband"></select>
+    </div>
+    <div class="form-row">
+      <label for="mag">Magnitude</label>
+      <input type="number" id="mag" name="mag" value="10" step="0.1">
+    </div>
+    <div class="form-row">
+      <label for="magsys">System</label>
+      <select id="magsys" name="magsys">
+        <option value="vega">Vega</option>
+        <option value="AB">AB</option>
+      </select>
+    </div>
+  </fieldset>
+</section>
+
+<!-- ===== SKY TAB ===== -->
+<section class="tab-panel" data-tab="tab-sky">
+  <fieldset>
+    <legend>Sky Conditions</legend>
+    <div class="form-row">
+      <label for="airmass">Airmass</label>
+      <input type="number" id="airmass" name="airmass" value="1.2" step="0.1" min="1" max="3">
+    </div>
+    <div class="form-row">
+      <label for="fli">Lunar Illumination (FLI)</label>
+      <input type="number" id="fli" name="fli" value="0.5" step="0.1" min="0" max="1">
+    </div>
+    <div class="form-row">
+      <label for="moonDistance">Moon distance [deg]</label>
+      <input type="number" id="moonDistance" name="moonDistance" value="30" step="1" min="0" max="180">
+    </div>
+    <div class="form-row">
+      <label for="waterVapour">PWV [mm]</label>
+      <input type="number" id="waterVapour" name="waterVapour" value="2.5" step="0.5" min="0">
+    </div>
+  </fieldset>
+</section>
+
+<!-- ===== SEEING / AO TAB ===== -->
+<section class="tab-panel" data-tab="tab-seeing">
+  <fieldset>
+    <legend>Seeing &amp; Image Quality</legend>
+    <div class="form-row">
+      <label for="turbulence_category">Turbulence category</label>
+      <select id="turbulence_category" name="turbulence_category"></select>
+    </div>
+    <div class="form-row">
+      <label for="aperturepix">Aperture diameter [pix]</label>
+      <select id="aperturepix" name="aperturepix"></select>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Adaptive Optics</legend>
+    <div class="form-row">
+      <label for="aoMode">AO mode</label>
+      <select id="aoMode" name="aoMode"></select>
+    </div>
+    <div id="ao-params" style="display:none">
+      <div class="form-row">
+        <label for="tts_mag">TTS star R mag</label>
+        <input type="number" id="tts_mag" name="tts_mag" value="12" step="0.5">
+      </div>
+      <div class="form-row">
+        <label for="separation">Separation [arcsec]</label>
+        <input type="number" id="separation" name="separation" value="0" step="1" min="0">
+      </div>
+    </div>
+  </fieldset>
+</section>
+
+<!-- ===== INSTRUMENT TAB ===== -->
+<section class="tab-panel" data-tab="tab-instrument">
+  <fieldset>
+    <legend>Configuration</legend>
+    <div class="form-row">
+      <label for="hawki_filter">Filter</label>
+      <select id="hawki_filter" name="hawki_filter"></select>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Detector</legend>
+    <p class="hint">HAWAII-2RG, 4 chips mosaic, 0.106&Prime;/pixel, 7.5&prime; &times; 7.5&prime; FOV</p>
+    <p class="hint">Non-destructive readout (NDR)</p>
+  </fieldset>
+</section>
+
+<!-- ===== EXPOSURE TIME TAB ===== -->
+<section class="tab-panel" data-tab="tab-timesnr">
+  <fieldset>
+    <legend>Exposure Time / S/N</legend>
+    <div class="form-row">
+      <label for="dit">DIT [s]</label>
+      <input type="number" id="dit" name="dit" value="10" step="0.1" min="0">
+    </div>
+    <div class="form-row">
+      <label for="ndit">NDIT</label>
+      <input type="number" id="ndit" name="ndit" value="6" step="1" min="1">
+    </div>
+    <p class="hint">Total integration = DIT &times; NDIT (excludes overheads)</p>
+  </fieldset>
+</section>
+
+<!-- ===== OUTPUT TAB ===== -->
+<section class="tab-panel" data-tab="tab-output">
+  <fieldset>
+    <legend>Output Plots</legend>
+    <div id="output-checkboxes"></div>
+  </fieldset>
+</section>
+
+</main>
+
+<!-- JSON Preview / Results -->
+<div id="preview-panel" style="display:none">
+  <div class="preview-header">
+    <h3 id="preview-title">JSON Preview</h3>
+    <button class="btn btn-small" id="btnClosePreview">&times;</button>
+  </div>
+  <pre id="jsonPreview"></pre>
+</div>
+
+<script>
+  const FORM_CONFIG = {{ config | tojson }};
+</script>
+<script src="/static/js/hawki_etc_form.js"></script>
+
+</body>
+</html>

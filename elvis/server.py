@@ -1,11 +1,40 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, jsonify, render_template
 import os
 import io
 
 from elvis.simulate import ElvisSimulation
+from elvis.eris_etc_form import eris_etc_form_bp
+from elvis.hawki_etc_form import hawki_etc_form_bp
 
 app = Flask(__name__)
+app.register_blueprint(eris_etc_form_bp)
+app.register_blueprint(hawki_etc_form_bp)
 PORT = 5000  # Change this to your desired port
+
+# Instrument registry — each ETC form blueprint adds an entry here.
+# Templates read this via the INSTRUMENTS Jinja2 global.
+INSTRUMENTS = [
+    {
+        "id": "eris",
+        "name": "ERIS",
+        "url": "/eris-etc-form",
+        "description": "Enhanced Resolution Imager and Spectrograph (VLT)",
+    },
+    {
+        "id": "hawki",
+        "name": "HAWK-I",
+        "url": "/hawki-etc-form",
+        "description": "High Acuity Wide-field K-band Imager (VLT)",
+    },
+]
+
+app.jinja_env.globals["INSTRUMENTS"] = INSTRUMENTS
+
+
+@app.route("/")
+def index():
+    """Splash page listing all available instrument ETC forms."""
+    return render_template("index.html", current_instrument=None)
 
 
 @app.route('/process', methods=['POST'])
